@@ -31,7 +31,7 @@ task :build do
 ."
 
   Dir.chdir '..'
-  sh "cp checks/#{config['package_name']}_#{version}_all.deb packages/"
+  sh "mv checks/#{config['package_name']}_#{version}_all.deb packages/"
 
 end
 
