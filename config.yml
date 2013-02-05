@@ -1,0 +1,3 @@
+package_name: 'nine-check-mk-checks'
+package_description: 'Check_MK checks'
+package_website: 'https://wiki.nine.ch/'
