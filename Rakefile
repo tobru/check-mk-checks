@@ -23,7 +23,7 @@ task :build do
 -s dir \
 -t deb \
 -n #{config['package_name']} \
---prefix / \
+--prefix #{config['package_prefix']} \
 -v #{version} \
 -a all \
 --description \"#{config['package_description']}\" \
