@@ -12,7 +12,7 @@ def check_brocade_temp(item, params, info):
    warn, crit = params
    for name, value in info:
        if name == item:
-           temp = saveint(value)/2
+           temp = savefloat(value)/2
            perfdata = [ ( "temp", temp, warn, crit ) ]
            if temp > crit:
                return (2, "CRITICAL - temperature of " + name + " is " + str(temp), perfdata)
