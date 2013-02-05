@@ -5,21 +5,25 @@
 brocade_temp_default_values = (60, 70)
 
 def inventory_brocade_temp(info):
+   inventory = []
    if len(info) > 0:
-       return [ (line[0], None, "brocade_temp_default_values") for line in info ]
+       for line in info:
+           inventory.append( (line[0].split(': ')[1], "brocade_temp_default_values") )
+       return inventory
 
 def check_brocade_temp(item, params, info):
    warn, crit = params
    for name, value in info:
-       if name == item:
+       splittedname = name.split(': ')[1]
+       if splittedname == item:
            temp = savefloat(value)/2
            perfdata = [ ( "temp", temp, warn, crit ) ]
            if temp > crit:
-               return (2, "CRITICAL - temperature of " + name + " is " + str(temp), perfdata)
+               return (2, "CRITICAL - TEMP " + splittedname + " is " + str(temp), perfdata)
            if temp > warn:
-               return (1, "WARNING - temperature of " + name + " is " + str(temp), perfdata)
+               return (1, "WARNING - TEMP " + splittedname + " is " + str(temp), perfdata)
            else:
-               return (0, "OK - temperature of " + name + " is " + str(temp), perfdata)
+               return (0, "OK - TEMP " + splittedname + " is " + str(temp), perfdata)
    return (3, "UNKNOWN - temperature is not readable")
 
 check_info['brocade_temp'] = {
