@@ -1,0 +1,52 @@
+#!/usr/bin/python
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+
+# set default value of variable (user can override in main.mk)
+# routes received:
+brocade_bgp_default_values = (1, 0)
+
+def inventory_brocade_bgp(info):
+   inventory = []
+   if len(info) > 0:
+       for line in info:
+           inventory.append( (line[0], "brocade_bgp_default_values") )
+       return inventory
+
+def check_brocade_bgp(item, params, info):
+   warn, crit = params
+   for name, state, routes in info:
+       if name == item:
+           routesint = saveint(routes)
+           perfdata = [ ( "routes", routesint, warn, crit ) ]
+           if state == "0":
+               return (2, "CRITICAL - BGP session state with " + name + " is noState(0)", perfdata)
+           if state == "1":
+               return (1, "WARNING - BGP session state with " + name + " is idle(1)", perfdata)
+           if state == "2":
+               return (1, "WARNING - BGP session state with " + name + " is connect(2)", perfdata)
+           if state == "3":
+               return (1, "WARNING - BGP session state with " + name + " is active(3)", perfdata)
+           if state == "4":
+               return (1, "WARNING - BGP session state with " + name + " is openSent(4)", perfdata)
+           if state == "5":
+               return (1, "WARNING - BGP session state with " + name + " is openConfirm(5)", perfdata)
+           if state == "6":
+               if routesint <= warn and routesint > crit:
+                   return (1, "WARNING - BGP session state with " + name + " is established(6) - warn low routes: " + routes, perfdata)
+               if routesint <= crit:
+                   return (2, "CRITICAL - BGP session state with " + name + " is established(6) - crit low routes: " + routes, perfdata)
+               else:
+                   return (0, "OK - BGP session state with " + name + " is established(6) - received routes: " + routes, perfdata)
+           else:
+               return (2, "CRITICAL - BGP session state with " + name + " is unknown", perfdata)
+   return (3, "UNKNOWN - temperature is not readable")
+
+check_info['brocade_bgp'] = {
+    "inventory_function"      : inventory_brocade_bgp,
+    "check_function"          : check_brocade_bgp,
+    "service_description"     : "BGP session %s",
+    "has_perfdata"            : True,
+    "group"                   : "bgp",
+    "snmp_info"               : ( ".1.3.6.1.4.1.1991.1.2.11.17.1.1", [ "2", "3", "5" ]),
+    "snmp_scan_function"      : lambda oid: "brocade" in oid(".1.3.6.1.2.1.1.1.0").lower(),
+}
