@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
+#
+# Author: Tobias Brunner <tobias.brunner@nine.ch>
 
 # set default value of variable (user can override in main.mk)
 brocade_temp_default_values = (60, 70)

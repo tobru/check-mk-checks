@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
+#
+# Author: Tobias Brunner <tobias.brunner@nine.ch>
 
 brocade_mem_default_levels = (80.0, 90.0)
 

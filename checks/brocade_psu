@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
+#
+# Author: Tobias Brunner <tobias.brunner@nine.ch>
 
 # Original decription from SNMP:
 # 'Power supply 1 (NA - AC - Regular) present, status ok'

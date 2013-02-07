@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
+#
+# Author: Tobias Brunner <tobias.brunner@nine.ch>
 
 def inventory_brocade_fan(info):
    if len(info) > 0:
