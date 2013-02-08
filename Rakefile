@@ -7,7 +7,14 @@ task :prepare, [:version] do |task,args|
 
   sh "echo #{args.version} > VERSION"
 
-  Dir.mkdir 'packages' unless Dir.exists?("packages")
+  # prepare dirs
+  FileUtils.mkdir 'packages'
+  FileUtils.mkdir_p 'workdir/doc/check_mk/checks' unless Dir.exists?('workdir/doc/check_mk/checks')
+  FileUtils.mkdir_p 'workdir/check_mk/checks' unless Dir.exists?('workdir/check_mk/checks')
+
+  # copy files
+  FileUtils.cp_r 'checks/.', 'workdir/check_mk/checks/'
+  FileUtils.cp_r 'doc/.', 'workdir/doc/check_mk/checks/'
 
 end
 
@@ -18,7 +25,7 @@ task :build do
   version = File.read('VERSION').strip
   version += "-#{ENV['BUILD_NUMBER']}" if ENV['BUILD_NUMBER']
 
-  Dir.chdir 'checks'
+  Dir.chdir 'workdir'
   sh "fpm \
 -s dir \
 -t deb \
@@ -31,7 +38,7 @@ task :build do
 ."
 
   Dir.chdir '..'
-  sh "mv checks/#{config['package_name']}_#{version}_all.deb packages/"
+  sh "mv workdir/#{config['package_name']}_#{version}_all.deb packages/"
 
 end
 
@@ -39,4 +46,5 @@ desc "Cleanup prepare dirs"
 task :clean do
   FileUtils.rm 'VERSION' if File.exists? 'VERSION'
   FileUtils.rm_r 'packages' if File.exists? 'packages'
+  FileUtils.rm_r 'workdir' if File.exists? 'workdir'
 end
