@@ -23,7 +23,7 @@ task :prepare, [:version] do |task,args|
 end
 
 desc "Prepare the package for OMD"
-task :prepareomd, [:site] do
+task :prepareomd, [:site] do |task,args|
   config = YAML.load_file('config.yml')
 
   # copy files

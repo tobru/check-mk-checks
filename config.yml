@@ -1,4 +1,3 @@
-package_name: 'nine-check-mk-checks'
 package_description: 'Additional Check_MK checks'
 package_website: 'https://github.com/tobru/check-mk-checks'
 cmk_checks_dir: '/usr/share/check_mk/checks'
