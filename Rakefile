@@ -35,7 +35,7 @@ task :prepareomd, [:site] do |task,args|
 end
 
 desc 'Build the package'
-task :build, [:pkgname] do
+task :build, :pkgname do |task,args|
   config = YAML.load_file('config.yml')
 
   version = File.read('VERSION').strip
