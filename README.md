@@ -2,7 +2,7 @@
 
 Some additional checks for [http://mathias-kettner.de/check_mk.html](Check_MK)
 
-They all feature automatic inventory and documentation
+They all feature automatic inventory, Perf-o-Meter and documentation
 
 # Included checks
 
@@ -21,14 +21,31 @@ They all feature automatic inventory and documentation
 
 # How to use them
 
-Just run `rake prepare[0.1]` and `rake build`. This creates a Debian package
+Just run `rake prepare[0.1]` and `rake build[check-mk-checks]`. This creates a Debian package
 which can be easily deployed to the monitoring server.
 
-* It deploys the files to `/usr/share/doc/check_mk/checks` and `/usr/share/check_mk/checks`. If your paths differ from them you should change it in the Rakefile.
-* The Rakefile is only used to create a Debian package with FPM, you don't need to use it for running the checks. Just copy them to the correct place on your system.
-* I will create a MKP package in the next days, so it's easier to use this checks.
+Change the paths according to your system in config.yml
 
 All checks are documented. Run `cmk -M` to see the documentation.
+
+## Rake jobs
+
+* `prepare[version]`: Copies files to their correspoding place under "workdir" (needed for FPM). version = package version
+* `build[packagename]`: Builds a Debian Package called `packagename`with FPM
+* `prepareomd[sitename]`: Copies the file to the correct place in an OMD structure
+* `clean`: Remove files and dirs created by `prepare`
+
+* The Rakefile is only used to create a Debian package with FPM, you don't need to use it for running the checks. Just copy them to the correct place on your system.
+
+## Check_MK Package (MKP)
+
+- Create a OMD site
+- Login as site user: `su - siteuser`
+- Clone this repository and run `rake prepareomd[sitename]`
+- Run `cmk -Pv find` to check which files will be included
+- Run `cmk -Pv create <packagename>` to prepare the MKP package
+- Edit `~/var/check_mk/packages/<packagename>` and change all params
+- Run `cmp -Pv pack <packagename>` to finally create the package
 
 # Credits
 
