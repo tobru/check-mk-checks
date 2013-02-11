@@ -11,3 +11,15 @@ description:
 
 inventory:
  One check is created for the Memory utilization
+
+perfdata:
+ One value: Memory used in percent,
+ including warning and critical levels.
+
+[parameters]
+warn (int): The warning level: the memory used should not go at or above this level
+crit (int): The critical level: the memory used should not go at or above this level
+
+[configuration] 
+brocade_mem_default_levels (int, int): The default levels to be used
+   for inventorized checks. This variable is preset to {(80.0, 90.0)}

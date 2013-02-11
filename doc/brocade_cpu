@@ -11,3 +11,15 @@ description:
 
 inventory:
  One check is created for the CPU utilization
+
+perfdata:
+ One value: CPU usage in last 5 minutes,
+ including warning and critical levels.
+
+[parameters]
+warn (int): The warning level: the CPU usage should not go at or up this level
+crit (int): The critical level: the CPU usage should not go at or up this level
+
+[configuration]
+brocade_cpu_default_levels (int, int): The default levels to be used
+   for inventorized checks. This variable is preset to {(80.0, 90.0)}

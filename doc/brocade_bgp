@@ -14,8 +14,20 @@ description:
  received routes the checks can be {OK}, {WARN}, {CRIT}
  or {UNKNOWN}.
 
+perfdata:
+ One value: number of received routes from the neighbor,
+ including warning and critical levels.
+
 item:
  The IP of the BGP neighbor as provided by the device.
 
 inventory:
  One check for each BGP neighbor is created by the inventory.
+
+[parameters]
+warn (int): The warning level: the routes received should not drop at or below this level
+crit (int): The critical level: the routes received received not drop at or below this level
+
+[configuration] 
+brocade_bgp_default_values (int, int): The default levels to be used
+   for inventorized checks. This variable is preset to {(1, 0)}

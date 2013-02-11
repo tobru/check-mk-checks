@@ -11,3 +11,15 @@ description:
 
 inventory:
  One check is created for every Temperature sensor found on the device
+
+perfdata:
+ One value: temperature in degrees
+ including warning and critical levels.
+
+[parameters]
+warn (int): The warning level: the temperature should not go above this level
+crit (int): The critical level: the temperature should not go above this level
+
+[configuration] 
+brocade_temp_default_values (int, int): The default levels to be used
+   for inventorized checks. This variable is preset to {(60, 70)}
