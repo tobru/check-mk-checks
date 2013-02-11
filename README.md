@@ -24,6 +24,10 @@ They all feature automatic inventory and documentation
 Just run `rake prepare[0.1]` and `rake build`. This creates a Debian package
 which can be easily deployed to the monitoring server.
 
+* It deploys the files to `/usr/share/doc/check_mk/checks` and `/usr/share/check_mk/checks`. If your paths differ from them you should change it in the Rakefile.
+* The Rakefile is only used to create a Debian package with FPM, you don't need to use it for running the checks. Just copy them to the correct place on your system.
+* I will create a MKP package in the next days, so it's easier to use this checks.
+
 All checks are documented. Run `cmk -M` to see the documentation.
 
 # Credits
