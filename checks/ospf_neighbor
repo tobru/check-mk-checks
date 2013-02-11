@@ -1,0 +1,183 @@
+#!/usr/bin/python
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+#
+#
+###############################################################################
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+###############################################################################
+
+###############################################################################
+# $Id: ospf_neighbor 288 2012-07-10 11:06:38Z twollner $
+# Descr: OSPF Neighbor State check_mk check
+# $Author: twollner $
+# $Date: 2012-07-10 13:06:38 +0200 (Tue, 10 Jul 2012) $
+# $Rev: 288 $
+###############################################################################
+# Author: Thomas Wollner (tw@wollner-net.de)
+###############################################################################
+
+# Example Agent Output:
+# OSPF-MIB
+
+# 1.3.6.1.2.1.14.10.1.1.172.20.2.214.0 = IpAddress: 172.20.2.214
+# 1.3.6.1.2.1.14.10.1.2.172.20.2.214.0 = INTEGER: 0
+# 1.3.6.1.2.1.14.10.1.3.172.20.2.214.0 = IpAddress: 192.168.1.2
+# 1.3.6.1.2.1.14.10.1.4.172.20.2.214.0 = INTEGER: 2
+# 1.3.6.1.2.1.14.10.1.5.172.20.2.214.0 = INTEGER: 1
+# 1.3.6.1.2.1.14.10.1.6.172.20.2.214.0 = INTEGER: 8
+# 1.3.6.1.2.1.14.10.1.7.172.20.2.214.0 = Counter32: 6
+# 1.3.6.1.2.1.14.10.1.8.172.20.2.214.0 = Gauge32: 0
+# 1.3.6.1.2.1.14.10.1.9.172.20.2.214.0 = INTEGER: 1
+# 1.3.6.1.2.1.14.10.1.10.172.20.2.214.0 = INTEGER: 1
+# 1.3.6.1.2.1.14.10.1.11.172.20.2.214.0 = INTEGER: 2
+
+
+check_default_levels["ospf_neighbor"] = "ospf_neighbor_default_levels"
+
+factory_settings["ospf_neighbor_default_levels"] = {
+    "ok_states"        : [ 8, 4 ],
+    "warning_states"   : [ 2, 3, 5, 6, 7 ],
+    "critical_states"  : [ 1 ],
+}
+
+def inventory_ospf_neighbor(info):
+    inventory = []
+
+    for id, ip, rtrid, options, prio, state, events, permanence, \
+     hellosup, helperstatus, helperage, helperexitreason in info:
+        inventory.append((rtrid, {}))
+    return inventory
+
+
+def ospf_nbr_state(st):
+    names = {   '1' : 'down',
+                '2' : 'attempt',
+                '3' : 'init',
+                '4' : 'twoWay',
+                '5' : 'exchangeStart',
+                '6' : 'exchange',
+                '7' : 'loading',
+                '8' : 'full' }
+    return names.get(st, st)
+
+
+def ospf_nbr_permanence(st):
+    names = {    '1' : 'dynamic',
+                 '2' : 'permanent' }
+    return names.get(st, st)
+
+
+def ospf_nbr_hellosuppressed(st):
+    names = {    '1' : 'true',
+                 '2' : 'false' }
+    return names.get(st, st)
+
+
+def ospf_nbr_helperstatus(st):
+    names = {    '1' : 'notHelping',
+                 '2' : 'helping' }
+    return names.get(st, st)
+
+
+def ospf_nbr_helperexitreason(st):
+    names = {    '1' : 'none',
+                 '2' : 'inProgress',
+                 '3' : 'completed',
+                 '4' : 'timedOut',
+                 '5' : 'topologyChanged' }
+    return names.get(st, st)
+
+
+def check_ospf_neighbor(item, params, info):
+
+    for id, ip, rtrid, options, prio, state, events, permanence, \
+     hellosupp, helperstatus, helperage, helperexitreason in info:
+
+        if rtrid == item:
+            nbrstatus = ospf_nbr_state(str(state))
+
+            output = "OSPF RouterID: %s NeighborAddress: %s NbrState: %s" % ( rtrid, ip, nbrstatus )
+            nbrstate = saveint(state)
+
+            if nbrstate in params["critical_states"]:
+                severity = "CRITICAL"
+                returncode = 2
+            elif nbrstate in params["warning_states"]:
+                severity = "WARNING"
+                returncode = 1
+            elif nbrstate in params["ok_states"]:
+                severity = "OK"
+                returncode = 0
+            else:
+                severity = "UNKNOWN"
+                returncode = 3
+                output = "Invalid Output from Agent"
+
+            if options:
+                output += " NbrOptions: %s" % (options)
+
+            if prio:
+                output += " NbrPriority: %s" % (prio)
+
+            if events:
+                output += " NbrEvents: %s" % (events)
+
+            if permanence:
+                permanencestr = ospf_nbr_permanence(str(permanence))
+                output += " NbrPermanence: %s" % (permanencestr)
+
+            if hellosupp:
+                hellosuppstr = ospf_nbr_hellosuppressed(str(hellosupp))
+                output += " NbrHelloSuppressed: %s" % hellosuppstr
+
+            if helperstatus:
+                helperstatusstr = ospf_nbr_helperstatus(str(helperstatus))
+                output += " NbrHelperStatus: %s" % (helperstatusstr)
+
+            if helperage:
+                output += " NbrHelperAge: %s" % (helperage)
+
+            if helperexitreason:
+                helperexitreasonstr = ospf_nbr_helperexitreason(helperexitreason)
+                output += " NbrHelperExitReason: %s" % (helperexitreasonstr)
+
+            return(returncode, severity + " - " + output)
+
+    return(3, "UKNOWN - item not found in snmp data")
+
+
+check_info['ospf_neighbor'] = \
+      (check_ospf_neighbor, "OSPF Neighbor %s", 0, inventory_ospf_neighbor)
+
+
+snmp_info['ospf_neighbor'] = \
+        ( ".1.3.6.1.2.1.14.10.1",[ OID_END,
+                                1, # "ospfNbrIpAddr"
+                                3, # "ospfNbrRtrId"
+                                4, # "ospfNbrOptions"
+                                5, # "ospfNbrPriority"
+                                6, # "ospfNbrState
+                                7, # "ospfNbrEvents"
+                                10, # "ospfNbrPermanence"
+                                11, # "ospfNbrHelloSuppressed"
+                                12, # "ospfNbrRestartHelperStatus"
+                                13, # "ospfNbrRestartHelperAge"
+                                14, # "ospfNbrRestartHelperExitReason"
+                                ]
+        )
+
+
+snmp_scan_functions["ospf_neighbor"] = \
+lambda oid: oid(".1.3.6.1.2.1.14.10.1.*") != None
+

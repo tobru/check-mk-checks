@@ -1,0 +1,93 @@
+title: OSPF Neighbor State Monitoring
+agents: snmp
+author: Thomas Wollner
+license: GPLv3
+distribution:
+description:
+ This check monitors the OSPF neighborships between routers. With applied factory_settings the neighorship gets a critical state if neighborstate is down,
+ and a warning state if neighborship is not in state full or two-way. This behaviour can be configured via check_parameters.
+
+ Explanation of check output:
+
+ {OSPF RouterID:}
+  A 32-bit integer (represented as a type IpAddress) uniquely identifying the neighboring router in the Autonomous System.
+
+ {NeighborAddress:}
+  The IP address of this neighbor.
+
+ {NbrState:}
+  The State of the relationship with this Neighbor
+
+ Possible OSPF Neighbor States: (Source: http://www.cisco.com/en/US/tech/tk365/technologies_tech_note09186a0080093f0e.shtml)
+
+ {--Down}
+ This is the first OSPF neighbor state. It means that no information (hellos) has been received from this neighbor, but hello packets can still be sent to the neighbor in this state. During the fully adjacent neighbor state, if a router doesn't receive hello packet from a neighbor within the RouterDeadInterval time (RouterDeadInterval = 4*HelloInterval by default) or if the manually configured neighbor is being removed from the configuration, then the neighbor state changes from Full to Down.
+
+ {--Attempt}
+ This state is only valid for manually configured neighbors in an NBMA environment. In Attempt state, the router sends unicast hello packets every poll interval to the neighbor, from which hellos have not been received within the dead interval.
+
+ {--Init}
+ This state specifies that the router has received a hello packet from its neighbor, but the receiving router's ID was not included in the hello packet. When a router receives a hello packet from a neighbor, it should list the sender's router ID in its hello packet as an acknowledgment that it received a valid hello packet.
+
+ {--2-Way}
+ This state designates that bi-directional communication has been established between two routers. Bi-directional means that each router has seen the other's hello packet. This state is attained when the router receiving the hello packet sees its own Router ID within the received hello packet's neighbor field. At this state, a router decides whether to become adjacent with this neighbor. On broadcast media and non-broadcast multiaccess networks, a router becomes full only with the designated router (DR) and the backup designated router (BDR); it stays in the 2-way state with all other neighbors. On Point-to-point and Point-to-multipoint networks, a router becomes full with all connected routers. At the end of this stage, the DR and BDR for broadcast and non-broadcast multiacess networks are elected. For more information on the DR election process, refer to DR Election. Note: Receiving a Database Descriptor (DBD) packet from a neighbor in the init state will also a cause a transition to 2-way state.
+
+ {--Exstart}
+ Once the DR and BDR are elected, the actual process of exchanging link state information can start between the routers and their DR and BDR. In this state, the routers and their DR and BDR establish a master-slave relationship and choose the initial sequence number for adjacency formation. The router with the higher router ID becomes the master and starts the exchange, and as such, is the only router that can increment the sequence number. Note that one would logically conclude that the DR/BDR with the highest router ID will become the master during this process of master-slave relation. Remember that the DR/BDR election might be purely by virtue of a higher priority configured on the router instead of highest router ID. Thus, it is possible that a DR plays the role of slave. And also note that master/slave election is on a per-neighbor basis.
+
+ {--Exchange}
+ In the exchange state, OSPF routers exchange database descriptor (DBD) packets. Database descriptors contain link-state advertisement (LSA) headers only and describe the contents of the entire link-state database. Each DBD packet has a sequence number which can be incremented only by master which is explicitly acknowledged by slave. Routers also send link-state request packets and link-state update packets (which contain the entire LSA) in this state. The contents of the DBD received are compared to the information contained in the routers link-state database to check if new or more current link-state information is available with the neighbor.
+
+ {--Loading}
+ In this state, the actual exchange of link state information occurs. Based on the information provided by the DBDs, routers send link-state request packets. The neighbor then provides the requested link-state information in link-state update packets. During the adjacency, if a router receives an outdated or missing LSA, it requests that LSA by sending a link-state request packet. All link-state update packets are acknowledged.
+
+ {--Full}
+ In this state, routers are fully adjacent with each other. All the router and network LSAs are exchanged and the routers' databases are fully synchronized. Full is the normal state for an OSPF router. If a router is stuck in another state, it's an indication that there are problems in forming adjacencies. The only exception to this is the 2-way state, which is normal in a broadcast network. Routers achieve the full state with their DR and BDR only. Neighbors always see each other as 2-way. 
+
+ {NbrOptions:}
+ A BIT Mask corresponding to the neighbors options field. 
+ Bit 0, if set, indicates that the area accepts and operates on external information; of zero, it is a stub area.
+ Bit 1, if set, indicates that the system will operate on Type of Service metrics other than TOS 0.
+ If zero, the neighbor will ignore all metrics except the TOS 0 metric.
+
+ {NbrPriority:}
+ The priority of this neighbor in the designated router election algorithm. The value 0 signifies that the neighbor is not eligible to becom the designated router on this particular network.
+
+ {NbrEvents:}
+ The number of times this neighbor relationship has changed state, or an error has occurred.
+
+ {NbrPermanence:}
+ This variable displays the status of the entry; 'dynamic' and 'permanent' refer to how the neighbor became known.
+
+ {NbrHelloSuppressed:}
+ Indicates whether Hellos are being suppressed to the neighbor.
+
+ {NbrRestartHelperStatus:}
+ Indicates whether the router is acting as a graceful restat helper for the neighbor.
+
+ {NbrRestartHelperAge:}
+ Remaining time in current OSPF graceful restart interval, if the router is acting as a restart helper.
+
+ {NbrRestartHelperExitReason:}
+ Describes the outcome of the last attempt at acting as a graceful restart helper for the neighbor.
+
+perfdata:
+  none
+
+item:
+  The OSPF RouterID
+
+inventory:
+  Inventory is supported. All OSPF neighborship entries will be inventorized.
+
+[parameters]
+parameters (dict):  Dictionary based parameter is supported. You can define which neighborstate results in which nagios state 
+                    ok_states
+                    warning_states
+                    critical_states
+
+                    example:
+                    check_parameters += [
+                  ( {"ok_states" : [ 8, 4 ], "warning_states" : [ 2, 3, 5, 6, 7 ], "critical_states" : [ 1 ]}, [yourRouter], ["OSPF Neighbor.*"] )
+                    ]
+
