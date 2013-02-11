@@ -1,4 +1,4 @@
-package_name: 'check-mk-checks-additional'
+package_name: 'nine-check-mk-checks'
 package_description: 'Additional Check_MK checks'
 package_website: 'https://github.com/tobru/check-mk-checks'
 package_prefix: '/usr/share'
