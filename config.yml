@@ -1,4 +1,7 @@
 package_name: 'nine-check-mk-checks'
 package_description: 'Additional Check_MK checks'
 package_website: 'https://github.com/tobru/check-mk-checks'
-package_prefix: '/usr/share'
+cmk_checks_dir: '/usr/share/check_mk/checks'
+cmk_checksdoc_dir: '/usr/share/doc/check_mk/checks'
+cmk_perfometer_dir: '/usr/share/check_mk/web/plugins/perfometer'
+cmk_pnptemplates_dir: '/usr/share/pnp4nagios/html/templates'

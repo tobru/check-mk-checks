@@ -9,12 +9,28 @@ task :prepare, [:version] do |task,args|
 
   # prepare dirs
   FileUtils.mkdir 'packages'
-  FileUtils.mkdir_p 'workdir/doc/check_mk/checks' unless Dir.exists?('workdir/doc/check_mk/checks')
-  FileUtils.mkdir_p 'workdir/check_mk/checks' unless Dir.exists?('workdir/check_mk/checks')
+  FileUtils.mkdir_p "workdir#{config['cmk_checks_dir']}" unless Dir.exists?("workdir#{config['cmk_checks_dir']}")
+  FileUtils.mkdir_p "workdir#{config['cmk_checksdoc_dir']}" unless Dir.exists?("workdir#{config['cmk_checksdoc_dir']}")
+  FileUtils.mkdir_p "workdir#{config['cmk_perfometer_dir']}" unless Dir.exists?("workdir#{config['cmk_perfometer_dir']}")
+  FileUtils.mkdir_p "workdir#{config['cmk_pnptemplates_dir']}" unless Dir.exists?("workdir#{config['cmk_pnptemplates_dir']}")
 
   # copy files
-  FileUtils.cp_r 'checks/.', 'workdir/check_mk/checks/'
-  FileUtils.cp_r 'doc/.', 'workdir/doc/check_mk/checks/'
+  FileUtils.cp_r 'checks/.', "workdir#{config['cmk_checks_dir']}"
+  FileUtils.cp_r 'doc/.', "workdir#{config['cmk_checksdoc_dir']}"
+  FileUtils.cp_r 'perf-o-meter/.', "workdir#{config['cmk_perfometer_dir']}"
+  FileUtils.cp_r 'pnp-templates/.', "workdir#{config['cmk_pnptemplates_dir']}"
+
+end
+
+desc "Prepare the package for OMD"
+task :prepareomd do
+  config = YAML.load_file('config.yml')
+
+  # copy files
+  FileUtils.cp_r 'checks/.', "/omd/sites/#{config['omd_site']}/#{config['omd_checks_dir']}"
+  FileUtils.cp_r 'doc/.', "/omd/sites/#{config['omd_site']}/#{config['omd_checksdoc_dir']}"
+  FileUtils.cp_r 'perf-o-meter/.', "/omd/sites/#{config['omd_site']}/#{config['omd_perfometer_dir']}"
+  FileUtils.cp_r 'pnp-templates/.', "/omd/sites/#{config['omd_site']}/#{config['omd_pnptemplates_dir']}"
 
 end
 
@@ -30,7 +46,7 @@ task :build do
 -s dir \
 -t deb \
 -n #{config['package_name']} \
---prefix #{config['package_prefix']} \
+--prefix / \
 -v #{version} \
 -a all \
 --description \"#{config['package_description']}\" \
