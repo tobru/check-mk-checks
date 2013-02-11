@@ -23,19 +23,19 @@ task :prepare, [:version] do |task,args|
 end
 
 desc "Prepare the package for OMD"
-task :prepareomd do
+task :prepareomd, [:site] do
   config = YAML.load_file('config.yml')
 
   # copy files
-  FileUtils.cp_r 'checks/.', "/omd/sites/#{config['omd_site']}/#{config['omd_checks_dir']}"
-  FileUtils.cp_r 'doc/.', "/omd/sites/#{config['omd_site']}/#{config['omd_checksdoc_dir']}"
-  FileUtils.cp_r 'perf-o-meter/.', "/omd/sites/#{config['omd_site']}/#{config['omd_perfometer_dir']}"
-  FileUtils.cp_r 'pnp-templates/.', "/omd/sites/#{config['omd_site']}/#{config['omd_pnptemplates_dir']}"
+  FileUtils.cp_r 'checks/.', "/omd/sites/#{args.site}/#{config['omd_checks_dir']}"
+  FileUtils.cp_r 'doc/.', "/omd/sites/#{args.site}/#{config['omd_checksdoc_dir']}"
+  FileUtils.cp_r 'perf-o-meter/.', "/omd/sites/#{args.site}/#{config['omd_perfometer_dir']}"
+  FileUtils.cp_r 'pnp-templates/.', "/omd/sites/#{args.site}/#{config['omd_pnptemplates_dir']}"
 
 end
 
 desc 'Build the package'
-task :build do
+task :build, [:pkgname] do
   config = YAML.load_file('config.yml')
 
   version = File.read('VERSION').strip
@@ -45,7 +45,7 @@ task :build do
   sh "fpm \
 -s dir \
 -t deb \
--n #{config['package_name']} \
+-n #{args.pkgname} \
 --prefix / \
 -v #{version} \
 -a all \
@@ -54,7 +54,7 @@ task :build do
 ."
 
   Dir.chdir '..'
-  sh "mv workdir/#{config['package_name']}_#{version}_all.deb packages/"
+  sh "mv workdir/#{args.pkgname}_#{version}_all.deb packages/"
 
 end
 
