@@ -54,7 +54,7 @@ def check_brocade_bgp(item, params, info):
                    return (0, "OK - BGP session state with " + name + " is established(6) - received routes: " + routes, perfdata)
            else:
                return (2, "CRITICAL - BGP session state with " + name + " is unknown", perfdata)
-   return (3, "UNKNOWN - temperature is not readable")
+   return (3, "UNKNOWN - BGP session state is not readable")
 
 check_info['brocade_bgp'] = {
     "inventory_function"      : inventory_brocade_bgp,
