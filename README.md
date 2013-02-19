@@ -23,23 +23,23 @@ the following devices are supported by these checks:
 
 Brocade FastIron and TurboIron devices running software release 07.2.02 and 
 later:
- Brocade FastIron Edge Swich X Series
- Brocade FastIron SX 800 and FastIron SX 1600
- Brocade FastIron SuperX
- Brocade FastIron GS and FastIron GS-STK
- Brocade FastIron LS and FastIron LS-STK
- Brocade FastIron WS
- Brocade FCX
- Brocade ICX
- Brocade TurboIron
+* Brocade FastIron Edge Swich X Series
+* Brocade FastIron SX 800 and FastIron SX 1600
+* Brocade FastIron SuperX
+* Brocade FastIron GS and FastIron GS-STK
+* Brocade FastIron LS and FastIron LS-STK
+* Brocade FastIron WS
+* Brocade FCX
+* Brocade ICX
+* Brocade TurboIron
 
 Brocade NetIron devices running Multi-Service IronWare release 05.2.00 and 
 later:
- Brocade MLX
- Brocade MLXe
- Brocade NetIron XMR
- Brocade NetIron CES
- Brocade NetIron CER series
+* Brocade MLX
+* Brocade MLXe
+* Brocade NetIron XMR
+* Brocade NetIron CES
+* Brocade NetIron CER series
 
 ## Agent
 
